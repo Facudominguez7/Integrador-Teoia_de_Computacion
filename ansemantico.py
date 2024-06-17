@@ -1,48 +1,47 @@
-from ansintactico import parser, Nodo, Id, Assign
-
-class AnalizadorSemantico:
+class SemanticAnalyzer:
     def __init__(self):
-        self.tabla_simbolos = {}
+        self.symbol_table = {}
 
-    def analizar(self, nodo):
-        metodo_nombre = f"analizar_{type(nodo).__name__}"
-        metodo = getattr(self, metodo_nombre, self.metodo_desconocido)
-        return metodo(nodo)
+    def visit(self, node):
+        method_name = 'visit_' + node.__class__.__name__
+        visitor = getattr(self, method_name, self.generic_visit)
+        return visitor(node)
 
-    def metodo_desconocido(self, nodo):
-        print(f"No se cómo analizar un nodo de tipo {type(nodo).__name__}")
+    def generic_visit(self, node):
+        raise Exception(f'No visit_{node.__class__.__name__} method')
 
-    def analizar_Nodo(self, nodo):
-        for hijo in nodo.hijos:
-            if isinstance(hijo, Nodo):
-                self.analizar(hijo)
+    def visit_Statements(self, node):
+        for statement in node.statements:
+            self.visit(statement)
 
-    def analizar_Id(self, nodo):
-        if nodo.valor not in self.tabla_simbolos:
-            raise Exception(f"Variable '{nodo.valor}' no definida.")
-        return self.tabla_simbolos[nodo.valor]
+    def visit_Assign(self, node):
+        var_name = node.name.name
+        if var_name not in self.symbol_table:
+            self.symbol_table[var_name] = None
+        self.symbol_table[var_name] = self.visit(node.expr)
 
-    def analizar_Assign(self, nodo):
-        if not isinstance(nodo.hijos[0], Id):
-            raise Exception("La asignación debe ser a una variable.")
-        valor = self.analizar(nodo.hijos[1])
-        self.tabla_simbolos[nodo.hijos[0].valor] = valor
-        return valor
+    def visit_Variable(self, node):
+        var_name = node.name
+        if var_name in self.symbol_table:
+            return self.symbol_table[var_name]
+        else:
+            raise Exception(f'Variable "{var_name}" not defined')
 
-def analizar_programa(programa):
-    analizador = AnalizadorSemantico()
-    try:
-        analizador.analizar(programa)
-        print("Análisis semántico completado sin errores.")
-    except Exception as e:
-        print(f"Error semántico: {e}")
+    def visit_Number(self, node):
+        return node.value
 
-if __name__ == "__main__":
-    data = '''
-    a = 3 + 4;
-    b = a * 2;
-    '''
-    programa = parser.parse(data)
-    if programa:
-        programa.imprimir()
-        analizar_programa(programa)
+    def visit_BinOp(self, node):
+        left_val = self.visit(node.left)
+        right_val = self.visit(node.right)
+        if node.op == '+':
+            return left_val + right_val
+        elif node.op == '-':
+            return left_val - right_val
+        elif node.op == '*':
+            return left_val * right_val
+        elif node.op == '/':
+            if right_val == 0:
+                raise Exception('Division by zero')
+            return left_val / right_val
+        else:
+            raise Exception(f'Unknown operator {node.op}')
