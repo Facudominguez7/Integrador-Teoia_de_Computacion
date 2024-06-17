@@ -6,9 +6,9 @@ _tabversion = '3.10'
 
 _lr_method = 'LALR'
 
-_lr_signature = 'leftPLUSMINUSleftTIMESDIVIDErightASSIGNASSIGN DIVIDE ID LPAREN MINUS NUMBER PLUS RPAREN SEMICOLON TIMESprogram : statement_liststatement_list : statement\n                      | statement_list statementstatement : expression_statement\n                 | assignment_statementexpression_statement : expression SEMICOLONassignment_statement : ID ASSIGN expression SEMICOLONexpression : term\n                  | expression PLUS term\n                  | expression MINUS termterm : factor\n            | term TIMES factor\n            | term DIVIDE factorfactor : NUMBER\n              | ID\n              | LPAREN expression RPAREN'
+_lr_signature = 'ASSIGN DIVIDE ID LPAREN MINUS NUMBER PLUS RPAREN SEMICOLON TIMESstatements : statements statementstatements : statementstatement : ID ASSIGN expression SEMICOLONexpression : expression PLUS term\n                  | expression MINUS termexpression : termterm : term TIMES factor\n            | term DIVIDE factorterm : factorfactor : NUMBERfactor : IDfactor : LPAREN expression RPAREN'
     
-_lr_action_items = {'ID':([0,2,3,4,5,11,12,13,14,15,16,17,18,27,],[7,7,-2,-4,-5,20,-3,-6,20,20,20,20,20,-7,]),'NUMBER':([0,2,3,4,5,11,12,13,14,15,16,17,18,27,],[10,10,-2,-4,-5,10,-3,-6,10,10,10,10,10,-7,]),'LPAREN':([0,2,3,4,5,11,12,13,14,15,16,17,18,27,],[11,11,-2,-4,-5,11,-3,-6,11,11,11,11,11,-7,]),'$end':([1,2,3,4,5,12,13,27,],[0,-1,-2,-4,-5,-3,-6,-7,]),'SEMICOLON':([6,7,8,9,10,20,21,22,23,24,25,26,],[13,-15,-8,-11,-14,-15,-9,-10,27,-12,-13,-16,]),'PLUS':([6,7,8,9,10,19,20,21,22,23,24,25,26,],[14,-15,-8,-11,-14,14,-15,-9,-10,14,-12,-13,-16,]),'MINUS':([6,7,8,9,10,19,20,21,22,23,24,25,26,],[15,-15,-8,-11,-14,15,-15,-9,-10,15,-12,-13,-16,]),'ASSIGN':([7,],[16,]),'TIMES':([7,8,9,10,20,21,22,24,25,26,],[-15,17,-11,-14,-15,17,17,-12,-13,-16,]),'DIVIDE':([7,8,9,10,20,21,22,24,25,26,],[-15,18,-11,-14,-15,18,18,-12,-13,-16,]),'RPAREN':([8,9,10,19,20,21,22,24,25,26,],[-8,-11,-14,26,-15,-9,-10,-12,-13,-16,]),}
+_lr_action_items = {'ID':([0,1,2,4,5,11,12,13,14,15,16,],[3,3,-2,-1,6,6,-3,6,6,6,6,]),'$end':([1,2,4,12,],[0,-2,-1,-3,]),'ASSIGN':([3,],[5,]),'NUMBER':([5,11,13,14,15,16,],[10,10,10,10,10,10,]),'LPAREN':([5,11,13,14,15,16,],[11,11,11,11,11,11,]),'TIMES':([6,8,9,10,18,19,20,21,22,],[-11,15,-9,-10,15,15,-7,-8,-12,]),'DIVIDE':([6,8,9,10,18,19,20,21,22,],[-11,16,-9,-10,16,16,-7,-8,-12,]),'SEMICOLON':([6,7,8,9,10,18,19,20,21,22,],[-11,12,-6,-9,-10,-4,-5,-7,-8,-12,]),'PLUS':([6,7,8,9,10,17,18,19,20,21,22,],[-11,13,-6,-9,-10,13,-4,-5,-7,-8,-12,]),'MINUS':([6,7,8,9,10,17,18,19,20,21,22,],[-11,14,-6,-9,-10,14,-4,-5,-7,-8,-12,]),'RPAREN':([6,8,9,10,17,18,19,20,21,22,],[-11,-6,-9,-10,22,-4,-5,-7,-8,-12,]),}
 
 _lr_action = {}
 for _k, _v in _lr_action_items.items():
@@ -17,7 +17,7 @@ for _k, _v in _lr_action_items.items():
       _lr_action[_x][_k] = _y
 del _lr_action_items
 
-_lr_goto_items = {'program':([0,],[1,]),'statement_list':([0,],[2,]),'statement':([0,2,],[3,12,]),'expression_statement':([0,2,],[4,4,]),'assignment_statement':([0,2,],[5,5,]),'expression':([0,2,11,16,],[6,6,19,23,]),'term':([0,2,11,14,15,16,],[8,8,8,21,22,8,]),'factor':([0,2,11,14,15,16,17,18,],[9,9,9,9,9,9,24,25,]),}
+_lr_goto_items = {'statements':([0,],[1,]),'statement':([0,1,],[2,4,]),'expression':([5,11,],[7,17,]),'term':([5,11,13,14,],[8,8,18,19,]),'factor':([5,11,13,14,15,16,],[9,9,9,9,20,21,]),}
 
 _lr_goto = {}
 for _k, _v in _lr_goto_items.items():
@@ -26,21 +26,17 @@ for _k, _v in _lr_goto_items.items():
        _lr_goto[_x][_k] = _y
 del _lr_goto_items
 _lr_productions = [
-  ("S' -> program","S'",1,None,None,None),
-  ('program -> statement_list','program',1,'p_program','ansintactico.py',80),
-  ('statement_list -> statement','statement_list',1,'p_statement_list','ansintactico.py',84),
-  ('statement_list -> statement_list statement','statement_list',2,'p_statement_list','ansintactico.py',85),
-  ('statement -> expression_statement','statement',1,'p_statement','ansintactico.py',92),
-  ('statement -> assignment_statement','statement',1,'p_statement','ansintactico.py',93),
-  ('expression_statement -> expression SEMICOLON','expression_statement',2,'p_expression_statement','ansintactico.py',97),
-  ('assignment_statement -> ID ASSIGN expression SEMICOLON','assignment_statement',4,'p_assignment_statement','ansintactico.py',101),
-  ('expression -> term','expression',1,'p_expression','ansintactico.py',105),
-  ('expression -> expression PLUS term','expression',3,'p_expression','ansintactico.py',106),
-  ('expression -> expression MINUS term','expression',3,'p_expression','ansintactico.py',107),
-  ('term -> factor','term',1,'p_term','ansintactico.py',114),
-  ('term -> term TIMES factor','term',3,'p_term','ansintactico.py',115),
-  ('term -> term DIVIDE factor','term',3,'p_term','ansintactico.py',116),
-  ('factor -> NUMBER','factor',1,'p_factor','ansintactico.py',123),
-  ('factor -> ID','factor',1,'p_factor','ansintactico.py',124),
-  ('factor -> LPAREN expression RPAREN','factor',3,'p_factor','ansintactico.py',125),
+  ("S' -> statements","S'",1,None,None,None),
+  ('statements -> statements statement','statements',2,'p_statements_multiple','ansintactico.py',31),
+  ('statements -> statement','statements',1,'p_statements_single','ansintactico.py',35),
+  ('statement -> ID ASSIGN expression SEMICOLON','statement',4,'p_statement_assign','ansintactico.py',39),
+  ('expression -> expression PLUS term','expression',3,'p_expression_binop','ansintactico.py',43),
+  ('expression -> expression MINUS term','expression',3,'p_expression_binop','ansintactico.py',44),
+  ('expression -> term','expression',1,'p_expression_term','ansintactico.py',48),
+  ('term -> term TIMES factor','term',3,'p_term_binop','ansintactico.py',52),
+  ('term -> term DIVIDE factor','term',3,'p_term_binop','ansintactico.py',53),
+  ('term -> factor','term',1,'p_term_factor','ansintactico.py',57),
+  ('factor -> NUMBER','factor',1,'p_factor_number','ansintactico.py',61),
+  ('factor -> ID','factor',1,'p_factor_id','ansintactico.py',65),
+  ('factor -> LPAREN expression RPAREN','factor',3,'p_factor_expr','ansintactico.py',69),
 ]

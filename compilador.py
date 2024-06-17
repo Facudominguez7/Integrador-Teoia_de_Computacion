@@ -1,27 +1,41 @@
 from anlexico import lexer
 from ansintactico import parser
-from ansemantico import analizar_programa
+from ansemantico import SemanticAnalyzer
+from gencode import CodeGenerator
 
-def compilar(data):
-    # Fase de análisis léxico
-    lexer.input(data)
-    while True:
-        tok = lexer.token()
-        if not tok:
-            break
-        print(tok)
+# Código fuente a analizar
+source_code = """
+a = 3 + 4;
+b = a * 2;
+c = b / (a - 1);
+"""
 
-    # Fase de análisis sintáctico
-    programa = parser.parse(data)
-    if programa:
-        programa.imprimir()
+# Análisis léxico
+lexer.input(source_code)
+print("### Análisis Léxico ###")
+while True:
+    tok = lexer.token()
+    if not tok:
+        break
+    print(tok)
 
-    # Fase de análisis semántico
-    analizar_programa(programa)
+# Análisis sintáctico
+ast = parser.parse(source_code)
+print("\n### Análisis Sintáctico ###")
+print(ast)
 
-if __name__ == "__main__":
-    data = '''
-    a = 3 + 4;
-    b = a * 2;
-    '''
-    compilar(data)
+# Análisis semántico
+analyzer = SemanticAnalyzer()
+print("\n### Análisis Semántico ###")
+try:
+    analyzer.visit(ast)
+    print("No semantic errors")
+except Exception as e:
+    print(f"Semantic Error: {e}")
+
+# Generación de código intermedio
+generator = CodeGenerator()
+generator.generate(ast)
+print("\n### Código Intermedio ###")
+for line in generator.code:
+    print(line)
