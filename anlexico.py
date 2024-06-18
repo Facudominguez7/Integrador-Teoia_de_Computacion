@@ -29,7 +29,7 @@ def t_newline(t):
     t.lexer.lineno += len(t.value)
 
 def t_error(t):
-    print(f"Illegal character '{t.value[0]}'")
+    print(f"Caractér Ilegal '{t.value[0]}'")
     t.lexer.skip(1)
 
 lexer = lex.lex()
