@@ -1,6 +1,8 @@
 class SemanticAnalyzer:
     def __init__(self):
         self.symbol_table = {}
+        #añadir conjunto para rastrear las variables usadas#
+        self.used_variables = set()
 
     def visit(self, node):
         method_name = 'visit_' + node.__class__.__name__
@@ -16,14 +18,21 @@ class SemanticAnalyzer:
 
     def visit_Assign(self, node):
         var_name = node.name.name
-        if var_name not in self.symbol_table:
+        value = self.visit(node.expr)
+        if isinstance(value, int):  # Asumiendo que todos los números son enteros
+            self.symbol_table[var_name] = value  # Propagación constante
+        else:
             self.symbol_table[var_name] = None
-        self.symbol_table[var_name] = self.visit(node.expr)
 
     def visit_Variable(self, node):
         var_name = node.name
         if var_name in self.symbol_table:
-            return self.symbol_table[var_name]
+            self.used_variables.add(var_name)  # Rastrear variables usadas
+            value = self.symbol_table[var_name]
+            if isinstance(value, int):  # Asumiendo que todos los números son enteros
+                return value  # Retornar valor constante si está disponible
+            else:
+                return None
         else:
             raise Exception(f'Variable "{var_name}" not defined')
 
@@ -45,3 +54,9 @@ class SemanticAnalyzer:
             return left_val / right_val
         else:
             raise Exception(f'Unknown operator {node.op}')
+    
+    def eliminate_dead_code(self):
+        # Método para eliminar código muerto después de visitar todos los nodos
+        for var_name in list(self.symbol_table.keys()):
+            if var_name not in self.used_variables:
+                del self.symbol_table[var_name]  # Eliminar asignaciones no utilizadas
