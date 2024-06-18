@@ -1,17 +1,17 @@
 from anlexico import lexer
 from ansintactico import parser
-from ansemantico import SemanticAnalyzer
-from gencode import CodeGenerator
+from ansemantico import AnalizadorSemantico
+from gencode import GeneradorCodigo
 
 # Código fuente a analizar
-source_code = """
+codigo_entrada = """
 a = 3 + 4;
 b = a * 2;
 c = b / (a - 1);
 """
 
 # Análisis léxico
-lexer.input(source_code)
+lexer.input(codigo_entrada)
 print("### Análisis Léxico ###")
 while True:
     tok = lexer.token()
@@ -20,22 +20,22 @@ while True:
     print(tok)
 
 # Análisis sintáctico
-ast = parser.parse(source_code)
+ast = parser.parse(codigo_entrada)
 print("\n### Análisis Sintáctico ###")
 print(ast)
 
 # Análisis semántico
-analyzer = SemanticAnalyzer()
+anSemantico = AnalizadorSemantico()
 print("\n### Análisis Semántico ###")
 try:
-    analyzer.visit(ast)
-    print("No semantic errors")
+    anSemantico.visitar(ast)
+    print("Sin errores semánticos")
 except Exception as e:
-    print(f"Semantic Error: {e}")
+    print(f"Error Semántico: {e}")
 
 # Generación de código intermedio
-generator = CodeGenerator()
-generator.generate(ast)
+generador = GeneradorCodigo()
+generador.generar(ast)
 print("\n### Código Intermedio ###")
-for line in generator.code:
-    print(line)
+for linea in generador.codigo:
+    print(linea)

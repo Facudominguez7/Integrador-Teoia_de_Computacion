@@ -1,62 +1,62 @@
-class SemanticAnalyzer:
+class AnalizadorSemantico:
     def __init__(self):
-        self.symbol_table = {}
-        #añadir conjunto para rastrear las variables usadas#
-        self.used_variables = set()
+        self.tabla_simbolos = {}
+        # Añadir conjunto para rastrear las variables usadas
+        self.variables_usadas = set()
 
-    def visit(self, node):
-        method_name = 'visit_' + node.__class__.__name__
-        visitor = getattr(self, method_name, self.generic_visit)
-        return visitor(node)
+    def visitar(self, nodo):
+        nombre_metodo = 'visitar_' + nodo.__class__.__name__
+        visitante = getattr(self, nombre_metodo, self.visita_generica)
+        return visitante(nodo)
 
-    def generic_visit(self, node):
-        raise Exception(f'No visit_{node.__class__.__name__} method')
+    def visita_generica(self, nodo):
+        raise Exception(f'No existe el método visitar_{nodo.__class__.__name__}')
 
-    def visit_Statements(self, node):
-        for statement in node.statements:
-            self.visit(statement)
+    def visitar_Declaraciones(self, nodo):
+        for declaracion in nodo.declaraciones:
+            self.visitar(declaracion)
 
-    def visit_Assign(self, node):
-        var_name = node.name.name
-        value = self.visit(node.expr)
-        if isinstance(value, int):  # Asumiendo que todos los números son enteros
-            self.symbol_table[var_name] = value  # Propagación constante
+    def visitar_Asignacion(self, nodo):
+        nombre_var = nodo.nombre.nombre
+        valor = self.visitar(nodo.expr)
+        if isinstance(valor, int):  # Asumiendo que todos los números son enteros
+            self.tabla_simbolos[nombre_var] = valor  # Propagación constante
         else:
-            self.symbol_table[var_name] = None
+            self.tabla_simbolos[nombre_var] = None
 
-    def visit_Variable(self, node):
-        var_name = node.name
-        if var_name in self.symbol_table:
-            self.used_variables.add(var_name)  # Rastrear variables usadas
-            value = self.symbol_table[var_name]
-            if isinstance(value, int):  # Asumiendo que todos los números son enteros
-                return value  # Retornar valor constante si está disponible
+    def visitar_Variable(self, nodo):
+        nombre_var = nodo.nombre
+        if nombre_var in self.tabla_simbolos:
+            self.variables_usadas.add(nombre_var)  # Rastrear variables usadas
+            valor = self.tabla_simbolos[nombre_var]
+            if isinstance(valor, int):  # Asumiendo que todos los números son enteros
+                return valor  # Retornar valor constante si está disponible
             else:
                 return None
         else:
-            raise Exception(f'Variable "{var_name}" not defined')
+            raise Exception(f'Variable "{nombre_var}" no definida')
 
-    def visit_Number(self, node):
-        return node.value
+    def visitar_Numero(self, nodo):
+        return nodo.valor
 
-    def visit_BinOp(self, node):
-        left_val = self.visit(node.left)
-        right_val = self.visit(node.right)
-        if node.op == '+':
-            return left_val + right_val
-        elif node.op == '-':
-            return left_val - right_val
-        elif node.op == '*':
-            return left_val * right_val
-        elif node.op == '/':
-            if right_val == 0:
-                raise Exception('Division by zero')
-            return left_val / right_val
+    def visitar_OperacionBinaria(self, nodo):
+        valor_izquierdo = self.visitar(nodo.izquierda)
+        valor_derecho = self.visitar(nodo.derecha)
+        if nodo.operador == '+':
+            return valor_izquierdo + valor_derecho
+        elif nodo.operador == '-':
+            return valor_izquierdo - valor_derecho
+        elif nodo.operador == '*':
+            return valor_izquierdo * valor_derecho
+        elif nodo.operador == '/':
+            if valor_derecho == 0:
+                raise Exception('División por cero')
+            return valor_izquierdo / valor_derecho
         else:
-            raise Exception(f'Unknown operator {node.op}')
+            raise Exception(f'Operador desconocido {nodo.operador}')
     
-    def eliminate_dead_code(self):
+    def eliminar_codigo_muerto(self):
         # Método para eliminar código muerto después de visitar todos los nodos
-        for var_name in list(self.symbol_table.keys()):
-            if var_name not in self.used_variables:
-                del self.symbol_table[var_name]  # Eliminar asignaciones no utilizadas
+        for nombre_var in list(self.tabla_simbolos.keys()):
+            if nombre_var not in self.variables_usadas:
+                del self.tabla_simbolos[nombre_var]  # Eliminar asignaciones no utilizadas
